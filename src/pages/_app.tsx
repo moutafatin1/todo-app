@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { AppRouter } from "@/server/routers/app";
+import { AppRouter } from "@/server/routers/_app";
 import { withTRPC } from "@trpc/next";
 
 function MyApp({ Component, pageProps }: AppProps) {
