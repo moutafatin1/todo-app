@@ -5,6 +5,7 @@ import React from "react";
 
 const Home: NextPage = () => {
   const { data: session } = useSession();
+  console.log(session);
   return (
     <div className="h-screen">
       <header className="flex justify-end p-5">
