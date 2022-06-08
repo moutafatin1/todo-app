@@ -1,72 +1,42 @@
-/* eslint-disable @next/next/no-img-element */
-import { Task } from "@/components";
-import { trpc } from "@/utils/trpc";
-import type { NextPage } from "next";
-import { useState } from "react";
+import { NextPage } from "next";
+import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
+import React from "react";
 
 const Home: NextPage = () => {
-  const [task, setTask] = useState("");
-  const utils = trpc.useContext();
-  const { data: todos, isLoading } = trpc.useQuery(["todo.all"]);
-  const addNewTask = trpc.useMutation("todo.new", {
-    async onSuccess() {
-      await utils.invalidateQueries("todo.all");
-    },
-  });
-  const deleteTaskMutation = trpc.useMutation("todo.delete", {
-    async onSuccess() {
-      await utils.invalidateQueries("todo.all");
-    },
-  });
-  const updateCompletedMutation = trpc.useMutation("todo.updateCompleted", {
-    async onSuccess() {
-      await utils.invalidateQueries("todo.all");
-    },
-  });
-  const newTask = () => {
-    addNewTask.mutate({ task });
-    setTask("");
-  };
-
-  const deleteTask = (id: string) => {
-    deleteTaskMutation.mutate(id);
-  };
-
-  const updateCompleted = (id: string, isCompleted: boolean) => {
-    updateCompletedMutation.mutate({ id, isCompleted });
-  };
-  if (isLoading) return <div>Is Loading...</div>;
+  const { data: session } = useSession();
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-2xl text-center text-white font-bold">
-      <div>
-        <ul className="space-y-3">
-          {todos?.map((todo) => (
-            <div key={todo.id} className="flex items-center relative ">
-              <Task todo={todo} updateCompleted={updateCompleted} />
-              <img
-                onClick={() => deleteTask(todo.id)}
-                src="https://img.icons8.com/plasticine/100/undefined/filled-trash.png"
-                alt="delete icon"
-                className="cursor-pointer hover:opacity-70 active:scale-95 w-16 h-16"
-              />
-            </div>
-          ))}
-        </ul>
-        <div className="relative  mt-5 w-full">
-          <input
-            type="text"
-            className="  rounded-lg w-full  p-2 text-gray-700 focus:outline-purple-700"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-          />
+    <div className="h-screen">
+      <header className="flex justify-end p-5">
+        {!session && (
           <button
-            onClick={newTask}
-            className="absolute px-4 py-2 right-0 bottom-0 top-0  bg-green-600 rounded-lg hover:bg-green-700 active:scale-95"
+            onClick={() => signIn("github")}
+            className="text-white bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 active:scale-95"
           >
-            Add
+            Sign in
           </button>
-        </div>
-      </div>
+        )}
+        {session && (
+          <>
+            <div className="flex flex-col mr-5">
+              <p className="text-xl text-white font-bold">
+                Welcome {session.user?.name ?? session.user?.email}
+              </p>
+              <Link href="/tasks" className="">
+                <a className="underline text-xl font-bold text-blue-500 hover:text-blue-600 transition-colors">
+                  Go to your tasks
+                </a>
+              </Link>
+            </div>
+            <button
+              onClick={() => signOut()}
+              className="text-white bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 active:scale-95"
+            >
+              Logout
+            </button>
+          </>
+        )}
+      </header>
     </div>
   );
 };
