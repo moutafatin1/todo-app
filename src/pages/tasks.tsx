@@ -1,7 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { Task } from "@/components";
+import { createContext } from "@/server/context";
+import { appRouter } from "@/server/routers/_app";
 import { trpc } from "@/utils/trpc";
-import type { GetServerSideProps, NextPage } from "next";
+import { createSSGHelpers } from "@trpc/react/ssg";
+import type { GetServerSideProps } from "next";
 import { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
@@ -13,7 +16,8 @@ type TasksPageProps = {
 const Tasks = ({ session }: TasksPageProps) => {
   const [task, setTask] = useState("");
   const utils = trpc.useContext();
-  const { data: todos, isLoading } = trpc.useQuery(["todo.all"]);
+  const { data: todos, isLoading, ...restData } = trpc.useQuery(["todo.all"]);
+  console.log("🚀 ~ file: tasks.tsx ~ line 17 ~ Tasks ~ restData", restData);
   const addNewTask = trpc.useMutation("todo.new", {
     async onSuccess() {
       await utils.invalidateQueries("todo.all");
@@ -81,14 +85,14 @@ export default Tasks;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  if (!session) {
+
+  if (!session)
     return {
       redirect: {
         destination: "/",
         permanent: false,
       },
     };
-  }
   return {
     props: { session },
   };

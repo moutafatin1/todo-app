@@ -5,9 +5,9 @@ import React from "react";
 
 const Home: NextPage = () => {
   const { data: session } = useSession();
-  console.log(session);
+  console.log("🚀 ~ file: index.tsx ~ line 8 ~ session", session);
   return (
-    <div className="h-screen">
+    <div className="h-screen container mx-auto">
       <header className="flex justify-end p-5">
         {!session && (
           <button

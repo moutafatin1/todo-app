@@ -5,16 +5,13 @@ import { createRouter } from "../createRouter";
 import { prisma } from "../prisma";
 
 const getUserIdOrThrow = async (ctx: Context) => {
-  const email = ctx.session?.user?.email;
-  if (!email) {
+  const id = ctx.session?.user?.id;
+  console.log("🚀 ~ file: todo.ts ~ line 9 ~ getUserIdOrThrow ~ id", id);
+  if (!id) {
     throw new TRPCError({ code: "FORBIDDEN" });
   }
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-  return user?.id;
+
+  return id;
 };
 
 export const todoRouter = createRouter()

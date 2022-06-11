@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-400;
+  @apply bg-gray-600;
 }
 
 @layer components {
   .isCompleted {
-    @apply line-through text-gray-600;
+    @apply line-through text-gray-800;
   }
 }
